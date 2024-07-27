@@ -94,12 +94,12 @@ func replyNotifications(mc *mastodon.Client, settings *app.Settings) {
 			}
 
 			switch n.Type {
-			case "favourite":
-				sendReply(settings, mc, n, "Danke für ⭐")
+			// case "favourite":
+			// 	sendReply(settings, mc, n, "Danke für ⭐")
 			case "follow":
 				sendReply(settings, mc, n, "Vielen Dank für das Interesse. 🤗")
-			case "reblog":
-				sendReply(settings, mc, n, "Vielen Dank für die Unterstützung. 🤗")
+			// case "reblog":
+			// 	sendReply(settings, mc, n, "Vielen Dank für die Unterstützung. 🤗")
 			case "mention":
 				doFavourite(settings, mc, n)
 			}
