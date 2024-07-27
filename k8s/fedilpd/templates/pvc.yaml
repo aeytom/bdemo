@@ -1,0 +1,16 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: {{ include "fedilpd.fullname" . }}-db
+  labels:
+    {{- include "fedilpd.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: {{ .Values.db.storage }}
+  {{ if .Values.db.storageClassName}}
+  storageClassName: {{ .Values.db.storageClassName }}
+  volumeMode: Filesystem
+  {{ end }}

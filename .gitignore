@@ -20,3 +20,9 @@
 # Go workspace file
 go.work
 go.work.sum
+env.yaml
+sent.db*
+vendor/
+microk8s.sh
+bdemo
+.vscode/

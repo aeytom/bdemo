@@ -1,0 +1,73 @@
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "fedilpd.fullname" . }}
+  labels:
+    {{- include "fedilpd.labels" . | nindent 4 }}
+spec:
+  schedule: '*/15 * * * *'
+  concurrencyPolicy: Forbid
+  startingDeadlineSeconds: 300
+
+  jobTemplate:
+    metadata:
+      creationTimestamp: null
+      name: fedilpd
+    spec:
+      activeDeadlineSeconds: 300
+      ttlSecondsAfterFinished: 300
+      backoffLimit: 0
+      completions: 1
+      template:
+        metadata:
+          {{- with .Values.podAnnotations }}
+          annotations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          labels:
+            {{- include "fedilpd.labels" . | nindent 12 }}
+            {{- with .Values.podLabels }}
+            {{- toYaml . | nindent 12 }}
+            {{- end }}
+        spec:
+          restartPolicy: Never
+          {{- with .Values.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          serviceAccountName: {{ include "fedilpd.serviceAccountName" . }}
+          securityContext:
+            {{- toYaml .Values.podSecurityContext | nindent 12 }}
+          volumes:
+            - name: config
+              secret:
+                secretName: {{ include "fedilpd.fullname" . }}-config
+            - name: db
+              persistentVolumeClaim:
+                claimName: {{ include "fedilpd.fullname" . }}-db
+          containers:
+          - name: {{ .Chart.Name }}
+            securityContext:
+              {{- toYaml .Values.securityContext | nindent 14 }}
+            image: "{{ .Values.image }}"
+            imagePullPolicy: IfNotPresent
+            resources:
+              {{- toYaml .Values.resources | nindent 14 }}
+            volumeMounts:
+              - mountPath: /app
+                name: config
+              - mountPath: /db
+                name: db
+          {{- with .Values.nodeSelector }}
+          nodeSelector:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.affinity }}
+          affinity:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          {{- with .Values.tolerations }}
+          tolerations:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+
